@@ -1,3 +1,4 @@
+#!/bin/bash
 from setuptools import setup
 
 setup(
