@@ -23,11 +23,11 @@ def read_funding_data(path):
             yield row
 
 
-def create_schema(colomns, file_name):
+def create_schema(columns, file_name):
     create_directory(file_name)
     pattern = {"type": "record", "namespase": "Tutorial", "name": f"{file_name}", "fields": []}
-    for colomn in colomns:
-        pattern["fields"].append({"name": colomn, "type": "string"})
+    for column in columns:
+        pattern["fields"].append({"name": column, "type": "string"})
     with open(f"./{file_name}_avro/{file_name}_schema.avsc", "w+") as schema:
         json.dump(pattern, schema)
 
@@ -36,17 +36,17 @@ def create_directory(file_name):
     os.mkdir(f"./{file_name}_avro")
 
 
-def get_colomn(data):
-    colomns = []
+def get_column(data):
+    columns = []
     for row in data:
-        colomns.extend(row.keys())
+        columns.extend(row.keys())
         break
-    return colomns
+    return columns
 
 
 def convert(file):
     file_name = file[:-4]
-    create_schema(get_colomn(read_funding_data(file)), file_name)
+    create_schema(get_column(read_funding_data(file)), file_name)
     create_avro(file_name, file)
 
 
