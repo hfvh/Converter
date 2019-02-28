@@ -9,8 +9,8 @@ import argparse
 
 
 def create_avro(file_name, file):
-    schema = avro.schema.Parse(open(f"../{file_name}_avro/{file_name}_schema.avsc", "rb").read())
-    writer = DataFileWriter(open(f"../{file_name}_avro/{file_name}.avro", "wb"), DatumWriter(), schema)
+    schema = avro.schema.Parse(open(f"./{file_name}_avro/{file_name}_schema.avsc", "rb").read())
+    writer = DataFileWriter(open(f"./{file_name}_avro/{file_name}.avro", "wb"), DatumWriter(), schema)
     for row in read_funding_data(file):
         writer.append(row)
     writer.close()
@@ -28,12 +28,12 @@ def create_schema(colomns, file_name):
     pattern = {"type": "record", "namespase": "Tutorial", "name": f"{file_name}", "fields": []}
     for colomn in colomns:
         pattern["fields"].append({"name": colomn, "type": "string"})
-    with open(f"../{file_name}_avro/{file_name}_schema.avsc", "w+") as schema:
+    with open(f"./{file_name}_avro/{file_name}_schema.avsc", "w+") as schema:
         json.dump(pattern, schema)
 
 
 def create_directory(file_name):
-    os.mkdir(f"../{file_name}_avro")
+    os.mkdir(f"./{file_name}_avro")
 
 
 def get_colomn(data):

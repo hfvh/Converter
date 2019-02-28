@@ -9,7 +9,7 @@ setup(
     packages=['converter'],
     entry_points={
         'console_scripts': [
-            'converter=converter.main:main',
+            'converter=converter.converter:main',
         ],
     },
 )
