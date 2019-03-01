@@ -7,4 +7,4 @@ cd Converter
 python3 -m pip install --user --upgrade setuptools wheel
 python setup.py sdist bdist_wheel
 cd dist
-pip install converter
+pip install converter-1.5.0.tar.gz
