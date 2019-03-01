@@ -77,7 +77,7 @@ def convert(file):
     """
     name = file[:-4]
     create_schema(get_column(read_funding_data(file)), name)
-    create_avro(name)
+    create_avro(file)
 
 
 def main():
