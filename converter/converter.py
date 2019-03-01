@@ -82,11 +82,11 @@ def convert(file):
 
 def main():
     """Call convert function with CLI arguments"""
-    parser = argparse.ArgumentParser(description='Command-line converter csv to avro')#create CLI parser
-    parser.add_argument("File", help="Csv file to convert")
+    parser = argparse.ArgumentParser(description='Command-line converter csv to avro')  # create CLI parser
+    parser.add_argument("FILE", help="Csv file to convert")
     args = parser.parse_args()
     try:
-        convert(args.File)
+        convert(args.FILE)
     except Exception as exception:
         print(exception)
 
