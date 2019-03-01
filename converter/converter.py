@@ -86,7 +86,7 @@ def main():
     parser.add_argument("File.csv", help="Csv file to convert")
     args = parser.parse_args()
     try:
-        convert(args.File)
+        convert(args.File.csv)
     except Exception as exception:
         print(exception)
 
