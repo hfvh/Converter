@@ -36,14 +36,14 @@ def create_avro(path, name, data, client_hdfs):
     schema = avro.schema.Parse(open(f"./{name[:-4]}_avro/{name[:-4]}_schema.avsc", "rb").read())  # read avro schema
     writer = DataFileWriter(open(f"./{name[:-4]}_avro/{name[:-4]}.avro", "wb"), DatumWriter(),
                             schema)  # create file and avro writer
-
     for row in data:
         writer.append(row)  # write row to avro file
     writer.close()
     if client_hdfs:
         new_path = path.split(name)[0]
-        print(new_path)
         client_hdfs.upload(new_path + "avro", f"./{name[:-4]}_avro/")
+        os.rmdir(f"./{name[:-4]}_avro")
+        os.remove(f"./name")
 
 
 def create_schema(columns, name):
@@ -80,7 +80,6 @@ def get_column(data):
     """
     columns = []
     for row in data:
-        print(row)
         columns.extend(row.keys())  # get first row in csv file and find columns names
         break
     return columns
@@ -93,7 +92,6 @@ def convert(path, client_hdfs=None):
         client_hdfs: hdfs client
     """
     regex = r"\w*\.\w*$"
-
     name = re.findall(regex, path)[0]
     data = read(path, name, client_hdfs)
     create_schema(get_column(data), name)
