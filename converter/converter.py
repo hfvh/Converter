@@ -19,7 +19,8 @@ def read(path, client_hdfs=None):
     """
     if client_hdfs:
         print("Client is hdfs")
-        with client_hdfs.read(path, encoding='utf-8') as reader:
+        with client_hdfs.read(path, encoding='utf-8') as hreader:
+            reader = csv.OrderedDict(hreader)
             for line in reader:
                 yield line
 
@@ -40,11 +41,8 @@ def create_avro(path, name, data, client_hdfs):
     schema = avro.schema.Parse(open(f"./{name[:-4]}_avro/{name[:-4]}_schema.avsc", "rb").read())  # read avro schema
     writer = DataFileWriter(open(f"./{name[:-4]}_avro/{name[:-4]}.avro", "wb"), DatumWriter(),
                             schema)  # create file and avro writer
-    keys = get_column2(data)
+
     for row in data:
-        if client_hdfs:
-            values = row.split(",")
-            row = OrderedDict(zip(keys, values))
         writer.append(row)  # write row to avro file
     writer.close()
     if client_hdfs:
