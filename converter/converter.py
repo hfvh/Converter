@@ -105,7 +105,7 @@ def main():
         if args.FILE:
             convert(args.FILE)
         elif args.HDFS:
-            client_hdfs = InsecureClient('http://' + os.environ['IP_HDFS'] + ':50070')
+            client_hdfs = InsecureClient('http://sandbox-hdp.hortonworks.com' + ':50070')
             convert(args.HDFS, client_hdfs)
     except Exception as exception:
         print(exception)
