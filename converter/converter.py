@@ -98,15 +98,15 @@ def convert(path, client_hdfs=None):
 def main():
     """Call convert function with CLI arguments"""
     parser = argparse.ArgumentParser(description='Command-line converter csv to avro')  # create CLI parser
-    parser.add_argument("FILE", help="Csv file to convert")
-    parser.add_argument("-hdfs", dest="HDFS_PATH", help="file location in hdfs")
+    parser.add_argument("-file", dest="FILE", help="Csv file to convert")
+    parser.add_argument("-hdfs", dest="HDFS", help="File location in hdfs")
     args = parser.parse_args()
     try:
         if args.FILE:
             convert(args.FILE)
         elif args.HDFS_PATH:
             client_hdfs = InsecureClient('http://' + os.environ['IP_HDFS'] + ':50070')
-            convert(args.HDFS_PATH)
+            convert(args.HDFS_PATH, client_hdfs)
     except Exception as exception:
         print(exception)
 
