@@ -7,7 +7,7 @@ import os
 import json
 import argparse
 from hdfs import InsecureClient
-import pandas as pd
+from collections import OrderedDict
 import re
 
 
@@ -40,7 +40,11 @@ def create_avro(path, name, data, client_hdfs):
     schema = avro.schema.Parse(open(f"./{name[:-4]}_avro/{name[:-4]}_schema.avsc", "rb").read())  # read avro schema
     writer = DataFileWriter(open(f"./{name[:-4]}_avro/{name[:-4]}.avro", "wb"), DatumWriter(),
                             schema)  # create file and avro writer
+    keys = get_column2(data)
     for row in data:
+        if client_hdfs:
+            values = row.split(",")
+            row = OrderedDict(zip(keys, values))
         writer.append(row)  # write row to avro file
     writer.close()
     if client_hdfs:
