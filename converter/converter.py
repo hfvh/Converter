@@ -19,7 +19,7 @@ def read(path, client_hdfs=None):
     """
     if client_hdfs:
         print("Client is hdfs")
-        with client_hdfs._get_home_directory(path, encoding='utf-8') as reader:
+        with client_hdfs._get_home_directory(path) as reader:
             df = csv.OrderedDict(reader)
             for line in df:
                 print(line)
