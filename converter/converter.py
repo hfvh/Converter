@@ -20,7 +20,7 @@ def read(path, client_hdfs=None):
     if client_hdfs:
         print("Client is hdfs")
         with client_hdfs.read(path, encoding='utf-8') as reader:
-            df = pd.read_csv(reader, index_col=0)
+            df = pd.read_csv(reader, index_col=0, dtype=dict)
             for line in df:
                 print(line)
                 yield line
