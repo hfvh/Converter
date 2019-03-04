@@ -1,7 +1,7 @@
 #!/bin/bash
 mkdir homework
 cd homework
-pip install avro-python3
+pip install avro-python3 pandas hdfs
 git clone https://github.com/hfvh/Converter.git
 cd Converter
 python3 -m pip install --user --upgrade setuptools wheel
