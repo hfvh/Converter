@@ -19,7 +19,7 @@ def read(path, client_hdfs=None):
     """
     if client_hdfs:
         print("Client is hdfs")
-        with csv.DictReader(client_hdfs.read(path, encoding='utf-8', delimiter='\n')) as reader:
+        with csv.DictReader(client_hdfs.read(path, encoding='utf-8')) as reader:
             for line in reader:
                 yield line
 
