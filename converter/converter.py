@@ -30,7 +30,7 @@ def read(path, client_hdfs=None):
                 yield row
 
 
-def create_avro(path, name, data,  client_hdfs):
+def create_avro(path, name, data, client_hdfs):
     """Create avro file using schema
     Args:
         path: file path
@@ -82,9 +82,15 @@ def get_column(data):
     """
     columns = []
     for row in data:
-        print(row)
-        row = dict(row)
         columns.extend(row.keys())  # get first row in csv file and find columns names
+        break
+    return columns
+
+
+def get_column2(data):
+    columns = []
+    for row in data:
+        columns = row.split(',')  # get first row in csv file and find columns names
         break
     return columns
 
@@ -98,7 +104,10 @@ def convert(path, client_hdfs=None):
     regex = r"\w*\.\w*$"
     data = read(path, client_hdfs)
     name = re.findall(regex, path)[0]
-    create_schema(get_column(data), name)
+    if client_hdfs:
+        create_schema(get_column2(data), name)
+    else:
+        create_schema(get_column(data), name)
     create_avro(path, name, data, client_hdfs)
 
 
