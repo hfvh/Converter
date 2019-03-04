@@ -85,6 +85,7 @@ def get_column(data):
     """
     columns = []
     for row in data:
+        print(row)
         columns.extend(row.keys())  # get first row in csv file and find columns names
         break
     return columns
