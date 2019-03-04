@@ -120,12 +120,12 @@ def main():
         print(exception)
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
 
-#
-file_name = 'sample_submission'
-reader = DataFileReader(open(f"{file_name}.avro", "rb"), DatumReader())
-for user in reader:
-    print(user)
-reader.close()
+
+# file_name = 'sample_submission'
+# reader = DataFileReader(open(f"{file_name}.avro", "rb"), DatumReader())
+# for user in reader:
+#     print(user)
+# reader.close()
