@@ -19,7 +19,7 @@ def read(path, client_hdfs=None):
     """
     if client_hdfs:
         print("Client is hdfs")
-        with csv.DictReader(client_hdfs.read(path, encoding='utf-8')) as reader:
+        with client_hdfs.read(path, encoding='utf-8') as reader:
             for line in reader:
                 yield line
 
@@ -82,6 +82,8 @@ def get_column(data):
     """
     columns = []
     for row in data:
+        print(row)
+        row = dict(row)
         columns.extend(row.keys())  # get first row in csv file and find columns names
         break
     return columns
