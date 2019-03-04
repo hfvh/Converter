@@ -19,7 +19,7 @@ def read(path, name, client_hdfs=None):
     """
     if client_hdfs:
         print("Client is hdfs")
-        client_hdfs.download(path)
+        client_hdfs.download(path, local_path='./')
         with open(name, 'r') as data:  # open csv file
             reader = csv.DictReader(data)  # create csv reader
             for row in reader:  # create csv file iterator
