@@ -11,7 +11,7 @@ import re
 import pandas as pd
 
 
-def read(path, client_hdfs=None):
+def read(path, name, client_hdfs=None):
     """File reader
     Args:
         path: file path
@@ -19,14 +19,8 @@ def read(path, client_hdfs=None):
     """
     if client_hdfs:
         print("Client is hdfs")
-        with client_hdfs._get_home_directory(path) as reader:
-            df = csv.OrderedDict(reader)
-            for line in df:
-                print(line)
-                yield line
-
-    else:
-        with open(path, 'r') as data:  # open csv file
+        client_hdfs.download(path)
+        with open(name, 'r') as data:  # open csv file
             reader = csv.DictReader(data)  # create csv reader
             for row in reader:  # create csv file iterator
                 yield row
@@ -98,8 +92,9 @@ def convert(path, client_hdfs=None):
         client_hdfs: hdfs client
     """
     regex = r"\w*\.\w*$"
-    data = read(path, client_hdfs)
+
     name = re.findall(regex, path)[0]
+    data = read(path, name, client_hdfs)
     create_schema(get_column(data), name)
     create_avro(path, name, data, client_hdfs)
 
