@@ -19,8 +19,8 @@ def read(path, client_hdfs=None):
     """
     if client_hdfs:
         print("Client is hdfs")
-        with client_hdfs.read(path, encoding='utf-8') as reader:
-            df = csv.OrderedDict(reader, index_col=0)
+        with client_hdfs._get_home_directory(path, encoding='utf-8') as reader:
+            df = csv.OrderedDict(reader)
             for line in df:
                 print(line)
                 yield line
@@ -123,7 +123,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-
 
 # file_name = 'sample_submission'
 # reader = DataFileReader(open(f"{file_name}.avro", "rb"), DatumReader())
