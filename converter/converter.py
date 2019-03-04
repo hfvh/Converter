@@ -106,7 +106,7 @@ def main():
             convert(args.FILE)
         elif args.HDFS_PATH:
             client_hdfs = InsecureClient('http://' + os.environ['IP_HDFS'] + ':50070')
-            convert(args.HDFS_PATH, client_hdfs)
+            convert(args.HDFS, client_hdfs)
     except Exception as exception:
         print(exception)
 
