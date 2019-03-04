@@ -18,6 +18,7 @@ def read(path, client_hdfs=None):
         client_hdfs: hdfs client
     """
     if client_hdfs:
+        print("Client is hdfs")
         with client_hdfs.read(path, encoding='utf-8') as reader:
             df = pd.read_csv(reader, index_col=0)
         return df
@@ -46,6 +47,7 @@ def create_avro(path, name, client_hdfs):
         client_hdfs.write(new_path, "./{name[:-4]}_avro")
 
 
+
 def create_schema(columns, name):
     """Create and store avro schema
     Args:
@@ -59,6 +61,7 @@ def create_schema(columns, name):
         pattern["fields"].append({"name": column, "type": "string"})  # write column name in pattern
     with open(f"./{name[:-4]}_avro/{name[:-4]}_schema.avsc", "w+") as schema:  # create file for schema
         json.dump(pattern, schema)  # append pattern structure to json file
+    print("Schema created")
 
 
 def create_directory(name):
@@ -67,6 +70,7 @@ def create_directory(name):
         name: file name
     """
     os.mkdir(f'./{name[:-4]}_avro')
+    print("Folder created")
 
 
 def get_column(data):
@@ -105,7 +109,8 @@ def main():
         if args.FILE:
             convert(args.FILE)
         elif args.HDFS:
-            client_hdfs = InsecureClient('http://sandbox-hdp.hortonworks.com' + ':50070')
+            client_hdfs = InsecureClient('http://localhost' + ':50070')
+            print("Connection with hdfs...")
             convert(args.HDFS, client_hdfs)
     except Exception as exception:
         print(exception)
