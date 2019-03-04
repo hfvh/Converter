@@ -19,8 +19,9 @@ def read(path, client_hdfs=None):
     """
     if client_hdfs:
         print("Client is hdfs")
-        with client_hdfs.read(path, encoding='utf-8') as reader:
-            return reader.read()
+        with client_hdfs.read(path, encoding='utf-8', delimiter='\n') as reader:
+            for line in reader:
+                yield line
 
     else:
         with open(path, 'r') as data:  # open csv file
@@ -29,7 +30,7 @@ def read(path, client_hdfs=None):
                 yield row
 
 
-def create_avro(path, name, client_hdfs):
+def create_avro(path, name, data,  client_hdfs):
     """Create avro file using schema
     Args:
         path: file path
@@ -39,7 +40,7 @@ def create_avro(path, name, client_hdfs):
     schema = avro.schema.Parse(open(f"./{name[:-4]}_avro/{name[:-4]}_schema.avsc", "rb").read())  # read avro schema
     writer = DataFileWriter(open(f"./{name[:-4]}_avro/{name[:-4]}.avro", "wb"), DatumWriter(),
                             schema)  # create file and avro writer
-    for row in read(path, client_hdfs):
+    for row in data:
         writer.append(row)  # write row to avro file
     writer.close()
     if client_hdfs:
@@ -93,9 +94,10 @@ def convert(path, client_hdfs=None):
         client_hdfs: hdfs client
     """
     regex = r"\w*\.\w*$"
+    data = read(path, client_hdfs)
     name = re.findall(regex, path)[0]
-    create_schema(get_column(read(path, client_hdfs)), name)
-    create_avro(path, name, client_hdfs)
+    create_schema(get_column(data), name)
+    create_avro(path, name, data, client_hdfs)
 
 
 def main():
