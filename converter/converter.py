@@ -90,7 +90,7 @@ def get_column(data):
 def get_column2(data):
     columns = []
     for row in data:
-        columns = row.split(',')  # get first row in csv file and find columns names
+        columns = row.rstrip().split(',')  # get first row in csv file and find columns names
         break
     return columns
 
