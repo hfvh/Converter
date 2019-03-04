@@ -42,7 +42,7 @@ def create_avro(path, name, data, client_hdfs):
     writer.close()
     if client_hdfs:
         new_path = path.split(name)[0]
-        client_hdfs.write(new_path, "./{name[:-4]}_avro")
+        client_hdfs.write(new_path, f"./{name[:-4]}_avro/")
 
 
 def create_schema(columns, name):
