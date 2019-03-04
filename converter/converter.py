@@ -7,8 +7,8 @@ import os
 import json
 import argparse
 from hdfs import InsecureClient
-from collections import OrderedDict
 import re
+import pandas as pd
 
 
 def read(path, client_hdfs=None):
@@ -19,9 +19,10 @@ def read(path, client_hdfs=None):
     """
     if client_hdfs:
         print("Client is hdfs")
-        with client_hdfs.read(path, encoding='utf-8') as hreader:
-            reader = csv.OrderedDict(hreader)
-            for line in reader:
+        with client_hdfs.read(path, encoding='utf-8') as reader:
+            df = pd.read_csv(reader, index_col=0)
+            for line in df:
+                print(line)
                 yield line
 
     else:
