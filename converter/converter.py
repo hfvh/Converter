@@ -90,14 +90,6 @@ def get_column(data):
     return columns
 
 
-def get_column2(data):
-    columns = []
-    for row in data:
-        columns = row.rstrip().split(',')  # get first row in csv file and find columns names
-        break
-    return columns
-
-
 def convert(path, client_hdfs=None):
     """Convert csv file into avro
     Args:
@@ -107,10 +99,7 @@ def convert(path, client_hdfs=None):
     regex = r"\w*\.\w*$"
     data = read(path, client_hdfs)
     name = re.findall(regex, path)[0]
-    if client_hdfs:
-        create_schema(get_column2(data), name)
-    else:
-        create_schema(get_column(data), name)
+    create_schema(get_column(data), name)
     create_avro(path, name, data, client_hdfs)
 
 
@@ -131,11 +120,12 @@ def main():
         print(exception)
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
 
 #
-# reader = DataFileReader(open(f"./{file_name}_avro/{file_name}.avro", "rb"), DatumReader())
-# for user in reader:
-#     print(user)
-# reader.close()
+file_name = 'sample_submission'
+reader = DataFileReader(open(f"{file_name}.avro", "rb"), DatumReader())
+for user in reader:
+    print(user)
+reader.close()
