@@ -20,8 +20,8 @@ def read(path, client_hdfs=None):
     if client_hdfs:
         print("Client is hdfs")
         with client_hdfs.read(path, encoding='utf-8') as reader:
-            df = pd.read_csv(reader, index_col=0)
-        return df
+            return reader.read()
+
     else:
         with open(path, 'r') as data:  # open csv file
             reader = csv.DictReader(data)  # create csv reader
@@ -45,7 +45,6 @@ def create_avro(path, name, client_hdfs):
     if client_hdfs:
         new_path = path.split(name)[0]
         client_hdfs.write(new_path, "./{name[:-4]}_avro")
-
 
 
 def create_schema(columns, name):
