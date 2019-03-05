@@ -7,8 +7,7 @@ import os
 import json
 import argparse
 from hdfs import InsecureClient
-import re
-import pandas as pd
+import shutil
 
 
 def read(path, name, client_hdfs=None):
@@ -17,13 +16,13 @@ def read(path, name, client_hdfs=None):
         path: file path
         client_hdfs: hdfs client
     """
-    if client_hdfs:
-        print("Client is hdfs")
-        client_hdfs.download(path, local_path='./')
-        with open(name, 'r') as data:  # open csv file
-            reader = csv.DictReader(data)  # create csv reader
-            for row in reader:  # create csv file iterator
-                yield row
+    file = []
+    client_hdfs.download(path, local_path='./')
+    with open(name, 'r') as data:  # open csv file
+        reader = csv.DictReader(data)  # create csv reader
+        for row in reader:  # create csv file iterator
+            file.append(row)
+    return file
 
 
 def create_avro(path, name, data, client_hdfs):
@@ -39,11 +38,14 @@ def create_avro(path, name, data, client_hdfs):
     for row in data:
         writer.append(row)  # write row to avro file
     writer.close()
-    if client_hdfs:
-        new_path = path.split(name)[0]
-        client_hdfs.upload(new_path + "avro", f"./{name[:-4]}_avro/")
-        os.rmdir(f"./{name[:-4]}_avro")
-        os.remove(f"./name")
+    rm_processing_files(path, name, client_hdfs)
+
+
+def rm_processing_files(path, name, client_hdfs):
+    new_path = path.split(name)[0]
+    client_hdfs.upload(new_path + "avro", f"./{name[:-4]}_avro/")
+    shutil.rmtree(f"./{name[:-4]}_avro")
+    os.remove(f"./{name}")
 
 
 def create_schema(columns, name):
@@ -52,37 +54,21 @@ def create_schema(columns, name):
         columns: columns list
         name: file name
     """
-    create_directory(name)
     pattern = {"type": "record", "namespase": "Tutorial", "name": f"{name[:-4]}",
                "fields": []}  # simple avro pattern without columns names
     for column in columns:
         pattern["fields"].append({"name": column, "type": "string"})  # write column name in pattern
-    with open(f"./{name[:-4]}_avro/{name[:-4]}_schema.avsc", "w+") as schema:  # create file for schema
-        json.dump(pattern, schema)  # append pattern structure to json file
-    print("Schema created")
-
-
-def create_directory(name):
-    """Create directory for new files
-    Args:
-        name: file name
-    """
-    os.mkdir(f'./{name[:-4]}_avro')
-    print("Folder created")
+    return pattern
 
 
 def get_column(data):
     """Find columns in csv format
     Args:
-        data: csv file iterator
+        data: csv data list
     Returns:
         The return columns list
     """
-    columns = []
-    for row in data:
-        columns.extend(row.keys())  # get first row in csv file and find columns names
-        break
-    return columns
+    return list(data[0].keys())
 
 
 def convert(path, client_hdfs=None):
@@ -91,25 +77,48 @@ def convert(path, client_hdfs=None):
         path: file path
         client_hdfs: hdfs client
     """
-    regex = r"\w*\.\w*$"
-    name = re.findall(regex, path)[0]
+    name = os.path.basename(path)
     data = read(path, name, client_hdfs)
-    create_schema(get_column(data), name)
+    os.mkdir(f'./{name[:-4]}_avro')
+    print("Folder created")
+    pattern = create_schema(get_column(data), name)
+    with open(f"./{name[:-4]}_avro/{name[:-4]}_schema.avsc", "w+") as schema:  # create file for schema
+        json.dump(pattern, schema)  # append pattern structure to json file
+    print("Schema created")
     create_avro(path, name, data, client_hdfs)
+
+
+def csv_reader(path, client_hdfs):
+    """Read first 10 avro row
+    Args:
+        path: file path
+        client_hdfs: hdfs client
+    """
+    client_hdfs.download(path, local_path='./')
+    name = os.path.basename(path)
+    reader = DataFileReader(open(f"./{name}", "rb"), DatumReader())
+    point = 0
+    for user in reader:
+        print(user)
+        point += 1
+        if point == 10:
+            break
+    reader.close()
+    os.remove(f"./{name}")
 
 
 def main():
     """Call convert function with CLI arguments"""
     parser = argparse.ArgumentParser(description='Command-line converter csv to avro')  # create CLI parser
-    parser.add_argument("-file", dest="FILE", help="Csv file to convert")
+    parser.add_argument("-read", dest="FILE", help="Csv file to read")
     parser.add_argument("-hdfs", dest="HDFS", help="File location in hdfs")
     args = parser.parse_args()
     try:
+        client_hdfs = InsecureClient('http://sandbox-hdp.hortonworks.com' + ':50070')
+        print("Connection with hdfs...")
         if args.FILE:
-            convert(args.FILE)
+            csv_reader(args.FILE, client_hdfs)
         elif args.HDFS:
-            client_hdfs = InsecureClient('http://sandbox-hdp.hortonworks.com' + ':50070')
-            print("Connection with hdfs...")
             convert(args.HDFS, client_hdfs)
     except Exception as exception:
         print(exception)
@@ -118,8 +127,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-# file_name = 'sample_submission'
-# reader = DataFileReader(open(f"{file_name}.avro", "rb"), DatumReader())
-# for user in reader:
-#     print(user)
-# reader.close()
+
