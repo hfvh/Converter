@@ -24,5 +24,3 @@ $ sh install_python36.sh
 $ sh install_converter.sh
 ```
 
-Documentation
--------------
