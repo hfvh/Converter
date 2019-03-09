@@ -21,8 +21,7 @@ def read(path, name, client_hdfs=None):
     with open(name, 'r') as data:  # open csv file
         reader = csv.DictReader(data)  # create csv reader
         for row in reader:  # create csv file iterator
-            file.append(row)
-    return file
+            yield row
 
 
 def create_avro(path, name, data, client_hdfs):
@@ -64,11 +63,15 @@ def create_schema(columns, name):
 def get_column(data):
     """Find columns in csv format
     Args:
-        data: csv data list
+        data: csv data iterator
     Returns:
         The return columns list
     """
-    return list(data[0].keys())
+    columns = []
+    for row in data:
+        columns.extend(row.keys())  # get first row in csv file and find columns names
+        break
+    return columns
 
 
 def convert(path, client_hdfs=None):
@@ -126,5 +129,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
